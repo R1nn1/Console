@@ -1,0 +1,128 @@
+-- Create ScreenGui
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "ConsoleViewerGui"
+screenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+
+-- Create Frame to hold everything
+local mainFrame = Instance.new("Frame")
+mainFrame.Name = "MainFrame"
+mainFrame.Size = UDim2.new(0, 420, 0, 300)
+mainFrame.Position = UDim2.new(0.5, -210, 0.5, -150)
+mainFrame.BackgroundColor3 = Color3.new(0, 0, 0)
+mainFrame.BorderSizePixel = 0
+mainFrame.Parent = screenGui
+
+-- Create ScrollingFrame for console output
+local consoleFrame = Instance.new("ScrollingFrame")
+consoleFrame.Name = "ConsoleOutput"
+consoleFrame.Size = UDim2.new(0, 400, 0, 230)
+consoleFrame.Position = UDim2.new(0, 10, 0, 10)
+consoleFrame.CanvasSize = UDim2.new(0, 0, 2, 0)
+consoleFrame.BackgroundColor3 = Color3.new(0, 0, 0)
+consoleFrame.BorderSizePixel = 0
+consoleFrame.ScrollBarThickness = 8
+consoleFrame.ScrollBarImageColor3 = Color3.new(1, 1, 1)
+consoleFrame.Parent = mainFrame
+
+-- Create UIListLayout inside ScrollingFrame
+local uiListLayout = Instance.new("UIListLayout")
+uiListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+uiListLayout.Parent = consoleFrame
+
+-- Create TextButton for copying text
+local copyButton = Instance.new("TextButton")
+copyButton.Name = "CopyButton"
+copyButton.Size = UDim2.new(0, 400, 0, 50)
+copyButton.Position = UDim2.new(0, 10, 0, 250)
+copyButton.Text = "Copy Text"
+copyButton.BackgroundColor3 = Color3.new(0, 0, 0)
+copyButton.TextColor3 = Color3.new(1, 1, 1)
+copyButton.BorderSizePixel = 0
+copyButton.Parent = mainFrame
+
+-- Create TextButton for minimizing the GUI
+local minimizeButton = Instance.new("TextButton")
+minimizeButton.Name = "MinimizeButton"
+minimizeButton.Size = UDim2.new(0, 30, 0, 30)
+minimizeButton.Position = UDim2.new(1, -40, 0, 10)
+minimizeButton.Text = "▼"
+minimizeButton.BackgroundColor3 = Color3.new(0, 0, 0)
+minimizeButton.TextColor3 = Color3.new(1, 1, 1)
+minimizeButton.BorderSizePixel = 0
+minimizeButton.Parent = mainFrame
+
+-- Create the Unminimize Button but don't parent it yet
+local unminimizeButton = Instance.new("TextButton")
+unminimizeButton.Name = "UnminimizeButton"
+unminimizeButton.Size = UDim2.new(0, 100, 0, 30)
+unminimizeButton.Position = UDim2.new(0.5, -50, 0, 10)
+unminimizeButton.Text = "▲"
+unminimizeButton.BackgroundColor3 = Color3.new(0, 0, 0)
+unminimizeButton.TextColor3 = Color3.new(1, 1, 1)
+unminimizeButton.BorderSizePixel = 0
+
+local isMinimized = false
+
+-- Function to log messages to the console
+local function logMessage(message, messageType)
+    local textLabel = Instance.new("TextLabel")
+    textLabel.Size = UDim2.new(1, 0, 0, 20)
+    textLabel.BackgroundTransparency = 1
+    textLabel.Text = "[" .. messageType .. "] " .. message
+    textLabel.TextColor3 = messageType == "Error" and Color3.new(1, 0, 0) or Color3.new(1, 1, 1)
+    textLabel.TextWrapped = true
+    textLabel.Font = Enum.Font.SourceSans
+    textLabel.TextSize = 14
+    textLabel.Parent = consoleFrame
+
+    -- Adjust the console size
+    consoleFrame.CanvasSize = UDim2.new(0, 0, 0, uiListLayout.AbsoluteContentSize.Y)
+end
+
+-- Function to copy console text
+local function copyConsoleText()
+    local allText = ""
+    for _, textLabel in pairs(consoleFrame:GetChildren()) do
+        if textLabel:IsA("TextLabel") then
+            allText = allText .. textLabel.Text .. "\n"
+        end
+    end
+    if setclipboard then
+        setclipboard(allText)
+        logMessage("Console text copied to clipboard", "Output")
+    else
+        logMessage("Copying to clipboard not supported", "Error")
+    end
+end
+
+-- Button click event for copying text
+copyButton.MouseButton1Click:Connect(copyConsoleText)
+
+-- Function to minimize the GUI
+local function minimizeGUI()
+    mainFrame:TweenPosition(UDim2.new(0.5, -210, -1, -300), "Out", "Sine", 0.5, true)
+    unminimizeButton.Parent = screenGui
+    minimizeButton.Visible = false
+    isMinimized = true
+end
+
+-- Function to unminimize the GUI
+local function unminimizeGUI()
+    mainFrame:TweenPosition(UDim2.new(0.5, -210, 0.5, -150), "Out", "Sine", 0.5, true)
+    unminimizeButton.Parent = nil
+    minimizeButton.Visible = true
+    isMinimized = false
+end
+
+-- Button click event for minimizing the GUI
+minimizeButton.MouseButton1Click:Connect(minimizeGUI)
+
+-- Button click event for unminimizing the GUI
+unminimizeButton.MouseButton1Click:Connect(unminimizeGUI)
+
+-- Capture all output
+local function captureOutput(message, messageType)
+    logMessage(message, messageType.Name)
+end
+
+game:GetService("LogService").MessageOut:Connect(captureOutput)
