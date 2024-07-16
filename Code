@@ -1,9 +1,9 @@
--- Create ScreenGui
+-- Create the ScreenGui don't rlly have to put this
 local screenGui = Instance.new("ScreenGui")
 screenGui.Name = "ConsoleViewerGui"
 screenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
 
--- Create Frame to hold everything
+-- Create Frame 
 local mainFrame = Instance.new("Frame")
 mainFrame.Name = "MainFrame"
 mainFrame.Size = UDim2.new(0, 420, 0, 300)
@@ -29,7 +29,7 @@ local uiListLayout = Instance.new("UIListLayout")
 uiListLayout.SortOrder = Enum.SortOrder.LayoutOrder
 uiListLayout.Parent = consoleFrame
 
--- Create TextButton for copying text
+-- Create TextButton for copying the message output
 local copyButton = Instance.new("TextButton")
 copyButton.Name = "CopyButton"
 copyButton.Size = UDim2.new(0, 400, 0, 50)
@@ -51,7 +51,7 @@ minimizeButton.TextColor3 = Color3.new(1, 1, 1)
 minimizeButton.BorderSizePixel = 0
 minimizeButton.Parent = mainFrame
 
--- Create the Unminimize Button but don't parent it yet
+-- Create the Unminimize Button to Unminimize the gui
 local unminimizeButton = Instance.new("TextButton")
 unminimizeButton.Name = "UnminimizeButton"
 unminimizeButton.Size = UDim2.new(0, 100, 0, 30)
